@@ -448,9 +448,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         historyList.innerHTML = history.map(item => `
-            <div class="history-card">
+            <div class="history-card" data-id="${item.id}">
                 <div class="date">
                     <span>${item.date}</span>
+                    <i class='bx bx-chevron-right'></i>
                 </div>
                 <h4 style="margin-bottom: 0.5rem;">Đối soát: ${item.period1} vs ${item.period2}</h4>
                 <div class="stats">
@@ -465,6 +466,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `).join('');
+    }
+
+    // Add interactivity to history list
+    const historyList = document.getElementById('history-list');
+    if (historyList) {
+        historyList.addEventListener('click', (e) => {
+            const card = e.target.closest('.history-card');
+            if (!card) return;
+
+            const reportId = parseInt(card.getAttribute('data-id'));
+            const history = JSON.parse(localStorage.getItem('kg_breakage_history') || '[]');
+            const report = history.find(item => item.id === reportId);
+
+            if (report) {
+                // Display the selected report
+                renderReport(report.details, report.totalLossItems, report.totalLossValue, report.period1, report.period2);
+                
+                // Show results section and scroll to it
+                document.getElementById('empty-state').style.display = 'none';
+                document.getElementById('analysis-results').style.display = 'block';
+                document.getElementById('analysis-results').scrollIntoView({ behavior: 'smooth' });
+                
+                // Track current report for re-saving if needed (though it's already saved)
+                currentReportToSave = report;
+                
+                showNotification('Xem lại', `Đang hiển thị báo cáo ngày ${report.date}`);
+            }
+        });
     }
 
     document.getElementById('btn-refresh-history').addEventListener('click', loadHistory);
