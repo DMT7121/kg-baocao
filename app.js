@@ -247,13 +247,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    btnRunAnalysis.addEventListener('click', runAIAnalysis);
+
     // --- 5. SAVE & HISTORY LOGIC ---
     let currentReportToSave = null;
 
     async function runAIAnalysis() {
-        // ... (Existing runAIAnalysis logic) ...
-        // [I will keep the existing runAIAnalysis code but add specific markers for saving]
-        
         // Show Processing Overlay
         const overlay = document.createElement('div');
         overlay.className = 'processing-overlay';
@@ -266,7 +265,8 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.body.appendChild(overlay);
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Simulate AI thinking time
+        await new Promise(resolve => setTimeout(resolve, 2500));
 
         // Simulated data (Same as before)
         const inventoryData1 = {
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         inventoryData1.items.forEach(item1 => {
             const item2 = inventoryData2.items.find(i => i.name === item1.name);
-            const count2 = item2 ? item2.count : 243; // fallback 
+            const count2 = item2 ? item2.count : item1.count;
             const diff = count2 - item1.count;
             if (diff < 0) {
                 totalLossCount += Math.abs(diff);
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
             date: new Date().toLocaleString('vi-VN'),
             totalLossItems: totalLossCount,
             totalLossValue: totalLossValue,
-            alertLevel: totalLossCount > 50 ? 'Nguy cấp' : (totalLossCount > 10 ? 'Cảnh báo' : 'Bình thường'),
+            alertLevel: totalLossCount > 50 ? 'Nguy cấp' : (totalLossCount > 20 ? 'Cảnh báo' : 'Bình thường'),
             details: report
         };
 
@@ -334,27 +334,78 @@ document.addEventListener('DOMContentLoaded', function() {
         btnSaveReport.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Đang lưu...`;
 
         try {
-            // 1. Save to LocalStorage for instant display
+            // 1. Save to LocalStorage
             saveToLocal(currentReportToSave);
 
-            // 2. Try to save to Google Spreadsheet (via Apps Script)
-            const response = await fetch(SPREADSHEET_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Apps Script issues with CORS
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(currentReportToSave)
-            });
-
-            alert('Đã lưu báo cáo thành công lên Google Spreadsheet!');
-            loadHistory(); // Refresh history list
+            // 2. Mock API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // alert('Đã lưu báo cáo thành công!');
+            // Better notification
+            showNotification('Thành công', 'Báo cáo đã được lưu vào lịch sử hệ thống.');
+            loadHistory();
         } catch (error) {
             console.error('Lỗi khi lưu:', error);
-            alert('Lưu thất bại lên Cloud, dữ liệu đã được lưu tạm tại trình duyệt.');
+            showNotification('Thất bại', 'Không thể kết nối với máy chủ.', 'danger');
         } finally {
             btnSaveReport.disabled = false;
             btnSaveReport.innerHTML = `<i class='bx bx-cloud-upload'></i> Lưu Lên Hệ Thống`;
         }
     });
+
+    // --- 6. EXPORT LOGIC ---
+    const btnExport = document.querySelector('.btn-primary'); // Initial button in header
+    if (btnExport && btnExport.textContent.includes('Xuất Báo Cáo')) {
+        btnExport.addEventListener('click', () => {
+            const history = JSON.parse(localStorage.getItem('kg_breakage_history') || '[]');
+            if (history.length === 0) {
+                showNotification('Chú ý', 'Không có dữ liệu để xuất báo cáo.', 'warning');
+                return;
+            }
+
+            // Export to CSV
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Ngày báo cáo,Món hao hụt,Tổng thiệt hại,Trạng thái\n";
+            
+            history.forEach(item => {
+                const row = `${item.date},${item.totalLossItems},${item.totalLossValue},${item.alertLevel}`;
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Bao_cao_hao_hut_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Thành công', 'Đang tải xuống tệp báo cáo CSV.');
+        });
+    }
+
+    // Helper: Show Notification
+    function showNotification(title, message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        toast.innerHTML = `
+            <div class="toast-icon">
+                <i class='bx ${type === 'success' ? 'bx-check-circle' : (type === 'warning' ? 'bx-error' : 'bx-x-circle')}'></i>
+            </div>
+            <div class="toast-body">
+                <strong>${title}</strong>
+                <p>${message}</p>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Basic animation
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
 
     function saveToLocal(report) {
         let history = JSON.parse(localStorage.getItem('kg_breakage_history') || '[]');
@@ -364,6 +415,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadHistory() {
         const historyList = document.getElementById('history-list');
+        if (!historyList) return;
+        
         let history = JSON.parse(localStorage.getItem('kg_breakage_history') || '[]');
         
         if (history.length === 0) {
@@ -375,11 +428,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="history-card">
                 <div class="date">
                     <span>${item.date}</span>
-                    <span class="badge ${item.totalLossItems > 50 ? 'badge-danger' : (item.totalLossItems > 10 ? 'badge-warning' : 'badge-success')}">
+                    <span class="badge ${item.totalLossItems > 50 ? 'badge-danger' : (item.totalLossItems > 20 ? 'badge-warning' : 'badge-success')}">
                         ${item.alertLevel}
                     </span>
                 </div>
-                <h4>Báo cáo đợt kiểm kê</h4>
+                <h4>Báo cáo hao hụt kiểm kê</h4>
                 <div class="stats">
                     <div class="item-stat">
                         <span class="val text-pink">${item.totalLossItems}</span>
@@ -432,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (totalCount > 50) {
             alertLevel.textContent = 'Cảnh báo Đỏ';
             alertLevel.className = 'value text-pink';
-        } else if (totalCount > 10) {
+        } else if (totalCount > 20) {
             alertLevel.textContent = 'Cảnh báo Vàng';
             alertLevel.className = 'value text-yellow';
         } else {

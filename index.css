@@ -729,3 +729,70 @@ body {
     color: var(--text-secondary);
     text-transform: uppercase;
 }
+
+/* Toast Notifications */
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    z-index: 2000;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toast-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-notification.success { border-left: 4px solid var(--color-green); }
+.toast-notification.warning { border-left: 4px solid var(--color-yellow); }
+.toast-notification.danger { border-left: 4px solid var(--color-pink); }
+
+.toast-icon i {
+    font-size: 1.5rem;
+}
+
+.success .toast-icon i { color: var(--color-green); }
+.warning .toast-icon i { color: var(--color-yellow); }
+.danger .toast-icon i { color: var(--color-pink); }
+
+.toast-body strong {
+    display: block;
+    font-size: 0.95rem;
+    color: white;
+}
+
+.toast-body p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.1rem;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.2);
+}
