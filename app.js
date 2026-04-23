@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabContents = document.querySelectorAll('.tab-content');
     
     // Config for Spreadsheet Integration (Apps Script URL)
-    const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxo_Mv3S0XJj8AIsS6vA9uT9Ym-C3iYpU8QYvM-C3iYpU8QYvM/exec'; // Placeholder
+    const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby14oRijxHOcFujSHUzlRQI_n05v62f4TMTuqhjcnEN5budBW4pV4qFs_Alr5xsSCuybA/exec';
 
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
@@ -337,12 +337,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // 1. Save to LocalStorage
             saveToLocal(currentReportToSave);
 
-            // 2. Mock API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // 2. Real API call to Google Spreadsheet
+            const response = await fetch(SPREADSHEET_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(currentReportToSave)
+            });
             
-            // alert('Đã lưu báo cáo thành công!');
-            // Better notification
-            showNotification('Thành công', 'Báo cáo đã được lưu vào lịch sử hệ thống.');
+            showNotification('Thành công', 'Báo cáo đã được đồng bộ lên Google Spreadsheet!');
             loadHistory();
         } catch (error) {
             console.error('Lỗi khi lưu:', error);
