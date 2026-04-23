@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Tài chính - Chi phí & Doanh thu</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- BoxIcons cho Icon sắc nét -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="main-nav glass">
+            <div class="nav-brand">
+                <i class='bx bxs-dashboard text-blue'></i>
+                <span>King's Grill Admin</span>
+            </div>
+            <div class="nav-links">
+                <button class="nav-link active" data-tab="dashboard">
+                    <i class='bx bx-pie-chart-alt-2'></i> Tổng Quan
+                </button>
+                <button class="nav-link" data-tab="breakage">
+                    <i class='bx bx-package'></i> Báo Cáo Đổ Vỡ
+                </button>
+            </div>
+            <div class="nav-user">
+                <span class="user-name">Manager AI</span>
+                <div class="user-avatar">AI</div>
+            </div>
+        </nav>
+
+        <header class="dashboard-header">
+            <div>
+                <h1>Báo cáo Phân tích Chi phí & Doanh thu</h1>
+                <p>Số liệu tổng hợp đến hết ngày 19/04/2026</p>
+            </div>
+            <div class="user-profile">
+                <button class="btn btn-primary">
+                    <i class='bx bx-export'></i> Xuất Báo Cáo
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Areas -->
+        <main class="tab-content active" id="dashboard-tab">
+            <!-- KPI Grid -->
+            <!-- ... (Original KPI Grid) ... -->
+            <section class="kpi-grid">
+                <div class="kpi-card glass">
+                    <div class="kpi-icon icon-blue"><i class='bx bx-trending-up'></i></div>
+                    <div class="kpi-content">
+                        <p class="kpi-label">DOANH THU THUẦN</p>
+                        <h3 class="kpi-value text-blue">1.089.416.000 ₫</h3>
+                        <p class="kpi-subtext">Doanh thu tổng: 1.117.045.700 ₫</p>
+                    </div>
+                </div>
+                
+                <div class="kpi-card glass">
+                    <div class="kpi-icon icon-purple"><i class='bx bx-wallet'></i></div>
+                    <div class="kpi-content">
+                        <p class="kpi-label">TỔNG QUỸ LƯƠNG</p>
+                        <h3 class="kpi-value text-purple">215.938.102 ₫</h3>
+                        <p class="kpi-subtext">Tỷ trọng: <strong class="text-purple">19.82%</strong> DT Thuần</p>
+                    </div>
+                </div>
+                
+                <div class="kpi-card glass">
+                    <div class="kpi-icon icon-pink"><i class='bx bx-purchase-tag-alt' ></i></div>
+                    <div class="kpi-content">
+                        <p class="kpi-label">CHI PHÍ KHUYẾN MÃI</p>
+                        <h3 class="kpi-value text-pink">27.269.700 ₫</h3>
+                        <p class="kpi-subtext">Tỷ trọng: <strong class="text-pink">2.44%</strong> DT Tổng</p>
+                    </div>
+                </div>
+                
+                <div class="kpi-card glass">
+                    <div class="kpi-icon icon-green"><i class='bx bx-receipt'></i></div>
+                    <div class="kpi-content">
+                        <p class="kpi-label">THUẾ GTGT</p>
+                        <h3 class="kpi-value text-green">60.458.034 ₫</h3>
+                        <p class="kpi-subtext">Tỷ trọng: <strong class="text-green">5.55%</strong> DT Thuần</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Grid -->
+            <section class="charts-grid">
+                <!-- Chart 1: Cơ Cấu Lương -->
+                <div class="chart-container glass">
+                    <div class="chart-header">
+                        <h2>Cơ Cấu Chi Phí Lương</h2>
+                        <div class="chart-tabs">
+                            <button class="tab-btn active" data-target="pie-tong">Nhóm Chính</button>
+                            <button class="tab-btn" data-target="pie-chitiet">Chi Tiết</button>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="salaryStructureChart"></canvas>
+                    </div>
+                    <div class="chart-footer-info">
+                        <div class="info-item">
+                            <span class="info-label">BQL & Phục vụ:</span>
+                            <span class="info-value">101.116.852 ₫</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Bộ phận Khác:</span>
+                            <span class="info-value">114.821.250 ₫</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Tỉ trọng trên DT -->
+                <div class="chart-container glass">
+                    <div class="chart-header">
+                        <h2>Tỉ trọng Chi phí Lương / DT Thuần</h2>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="salaryRatioChart"></canvas>
+                    </div>
+                    <div class="chart-body" style="height: auto; min-height: unset; margin-top: 10px;">
+                         <p style="font-size: 0.85rem; color: var(--text-secondary); text-align: center;">Theo dõi hiệu quả chi phí nhân sự theo thời gian thực</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Insights -->
+            <section class="insights-section glass">
+                <h2><i class='bx bx-bulb text-yellow'></i> Đánh Giá & Phân Tích</h2>
+                <div class="insights-grid">
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon"><i class='bx bx-check-shield'></i></div>
+                        <div class="insight-text">
+                            <h4>Hiệu Quả Sử Dụng Lao Động Tốt</h4>
+                            <p>Chỉ số lương/doanh thu ở mức <strong class="text-green">19.82%</strong>. Mức này chứng tỏ đang kiểm soát chi phí nhân sự rất tốt, nằm trong giới hạn lý tưởng của ngành F&B (15% - 25%).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon"><i class='bx bx-restaurant' ></i></div>
+                        <div class="insight-text">
+                            <h4>Bếp Là Trọng Tâm Nhân Sự</h4>
+                            <p>Bộ phận <strong>Bếp</strong> chiếm tỷ trọng quỹ lương cao nhất (<strong class="text-yellow">8.66%</strong> trên DT và <strong>~44%</strong> tổng quỹ), phản ánh đúng bản chất đây là bộ phận cốt lõi.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon"><i class='bx bx-trending-down' ></i></div>
+                        <div class="insight-text">
+                            <h4>Chiến Lược Khuyến Mãi An Toàn</h4>
+                            <p>Mức chiết khấu <strong class="text-blue">2.44%</strong> nằm trong vùng rất an toàn, đóng vai trò kích cầu hiệu quả mà không gây hao hụt lớn đến biên lợi nhuận thực thu.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <main class="tab-content" id="breakage-tab">
+            <section class="breakage-container">
+                <div class="breakage-header">
+                    <div class="header-text">
+                        <h2>So Sánh & Phân Tích Đồ Vỡ</h2>
+                        <p>Kéo thả 2 ảnh kiểm kê (trước & sau) để AI tự động so sánh và báo cáo hao hụt.</p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-run-analysis" disabled>
+                        <i class='bx bx-wand-magic-1'></i> Chạy Phân Tích AI
+                    </button>
+                </div>
+
+                <div class="upload-grid">
+                    <div class="upload-zone glass" id="drop-zone-1">
+                        <input type="file" id="file-1" hidden accept="image/*">
+                        <div class="upload-content">
+                            <i class='bx bx-cloud-upload' ></i>
+                            <p>Ảnh Kiểm Kê Đợt 1</p>
+                            <span>Click hoặc kéo thả ảnh vào đây</span>
+                        </div>
+                        <div class="preview-container" id="preview-1"></div>
+                    </div>
+
+                    <div class="upload-zone glass" id="drop-zone-2">
+                        <input type="file" id="file-2" hidden accept="image/*">
+                        <div class="upload-content">
+                            <i class='bx bx-cloud-upload' ></i>
+                            <p>Ảnh Kiểm Kê Đợt 2</p>
+                            <span>Click hoặc kéo thả ảnh vào đây</span>
+                        </div>
+                        <div class="preview-container" id="preview-2"></div>
+                    </div>
+                </div>
+
+                <!-- Analysis Results (Hidden by default) -->
+                <div id="analysis-results" class="results-container" style="display: none;">
+                    <div class="results-summary glass">
+                        <div class="summary-kpi">
+                            <div class="kpi-mini">
+                                <span class="label">Tổng Vật Tư Hao Hụt</span>
+                                <span class="value text-pink" id="total-loss-items">--</span>
+                            </div>
+                            <div class="kpi-mini">
+                                <span class="label">Ước Tính Thiệt Hại</span>
+                                <span class="value text-yellow" id="total-loss-value">--</span>
+                            </div>
+                            <div class="kpi-mini">
+                                <span class="label">Mức Độ Cảnh Báo</span>
+                                <span class="value text-green" id="alert-level">Bình thường</span>
+                            </div>
+                            <div class="kpi-mini" style="border-left: 1px dashed var(--border-color); padding-left: 2rem; margin-left: 1rem;">
+                                <button class="btn btn-primary" id="btn-save-report">
+                                    <i class='bx bx-cloud-upload'></i> Lưu Lên Hệ Thống
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container glass">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Tên Vật Tư</th>
+                                    <th>Số Lượng Đợt 1</th>
+                                    <th>Số Lượng Đợt 2</th>
+                                    <th>Hao Hụt</th>
+                                    <th>Trạng Thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-tbody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state">
+                    <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-box-5302685-4424368.png" alt="Empty" style="width: 200px; opacity: 0.5;">
+                    <p>Chưa có dữ liệu phân tích. Hãy tải lên 2 ảnh kiểm kê để bắt đầu.</p>
+                </div>
+
+                <!-- History Section -->
+                <div class="history-container glass" style="margin-top: 3rem; padding: 1.5rem;">
+                    <div class="history-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3><i class='bx bx-history'></i> Lịch Sử Báo Cáo</h3>
+                        <button class="btn" style="background: rgba(255,255,255,0.05); font-size: 0.85rem;" id="btn-refresh-history">
+                            <i class='bx bx-refresh'></i> Làm mới
+                        </button>
+                    </div>
+                    <div id="history-list" class="history-grid">
+                        <!-- History cards will appear here -->
+                        <div class="empty-history" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                            <p>Đang tải lịch sử...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
