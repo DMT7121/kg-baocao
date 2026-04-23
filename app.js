@@ -298,6 +298,10 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalLossCount = 0;
         let totalLossValue = 0;
 
+        // Names of comparison periods
+        const period1Name = inventoryData1.date;
+        const period2Name = inventoryData2.date;
+
         inventoryData1.items.forEach(item1 => {
             const item2 = inventoryData2.items.find(i => i.name === item1.name);
             const count2 = item2 ? item2.count : item1.count;
@@ -321,12 +325,14 @@ document.addEventListener('DOMContentLoaded', function() {
         currentReportToSave = {
             id: Date.now(),
             date: new Date().toLocaleString('vi-VN'),
+            period1: period1Name,
+            period2: period2Name,
             totalLossItems: totalLossCount,
             totalLossValue: totalLossValue,
             details: report
         };
 
-        renderReport(report, totalLossCount, totalLossValue);
+        renderReport(report, totalLossCount, totalLossValue, period1Name, period2Name);
         
         document.body.removeChild(overlay);
         document.getElementById('empty-state').style.display = 'none';
@@ -342,6 +348,12 @@ document.addEventListener('DOMContentLoaded', function() {
         btnSaveReport.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Đang lưu...`;
 
         try {
+            // Add raw JSON for spreadsheet column
+            const dataToSave = {
+                ...currentReportToSave,
+                rawJson: JSON.stringify(currentReportToSave)
+            };
+
             // 1. Save to LocalStorage
             saveToLocal(currentReportToSave);
 
@@ -350,10 +362,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(currentReportToSave)
+                body: JSON.stringify(dataToSave)
             });
             
-            showNotification('Thành công', 'Báo cáo đã được đồng bộ lên Google Spreadsheet!');
+            showNotification('Thành công', 'Báo cáo đã được đồng bộ lên Google Spreadsheet (Bao gồm dữ liệu JSON)!');
             loadHistory();
         } catch (error) {
             console.error('Lỗi khi lưu:', error);
@@ -376,10 +388,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Export to CSV
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Ngày báo cáo,Món hao hụt,Tổng thiệt hại thực tế\n";
+            csvContent += "Ngày báo cáo,Đợt 1,Đợt 2,Món hao hụt,Tổng thiệt hại thực tế\n";
             
             history.forEach(item => {
-                const row = `${item.date},${item.totalLossItems},${item.totalLossValue}`;
+                const row = `${item.date},${item.period1},${item.period2},${item.totalLossItems},${item.totalLossValue}`;
                 csvContent += row + "\n";
             });
 
@@ -440,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="date">
                     <span>${item.date}</span>
                 </div>
-                <h4>Báo cáo hao hụt kiểm kê</h4>
+                <h4 style="margin-bottom: 0.5rem;">Đối soát: ${item.period1} vs ${item.period2}</h4>
                 <div class="stats">
                     <div class="item-stat">
                         <span class="val text-pink">${item.totalLossItems}</span>
@@ -460,9 +472,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial Load
     loadHistory();
 
-    function renderReport(report, totalCount, totalValue) {
+    function renderReport(report, totalCount, totalValue, p1, p2) {
         const tbody = document.getElementById('report-tbody');
         tbody.innerHTML = '';
+
+        // Update table headers to show period names
+        const headerP1 = document.querySelector('th:nth-child(3)');
+        const headerP2 = document.querySelector('th:nth-child(4)');
+        if (headerP1) headerP1.textContent = `Đợt 1 (${p1})`;
+        if (headerP2) headerP2.textContent = `Đợt 2 (${p2})`;
 
         report.forEach(row => {
             const tr = document.createElement('tr');
