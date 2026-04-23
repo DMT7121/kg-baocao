@@ -302,11 +302,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const item2 = inventoryData2.items.find(i => i.name === item1.name);
             const count2 = item2 ? item2.count : item1.count;
             const diff = count2 - item1.count;
+            const itemLossValue = diff < 0 ? Math.abs(diff) * item1.price : 0;
+
             if (diff < 0) {
                 totalLossCount += Math.abs(diff);
-                totalLossValue += Math.abs(diff) * item1.price;
+                totalLossValue += itemLossValue;
             }
-            report.push({ name: item1.name, count1: item1.count, count2: count2, diff: diff });
+            report.push({ 
+                name: item1.name, 
+                price: item1.price,
+                count1: item1.count, 
+                count2: count2, 
+                diff: diff,
+                lossValue: itemLossValue
+            });
         });
 
         currentReportToSave = {
@@ -314,7 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
             date: new Date().toLocaleString('vi-VN'),
             totalLossItems: totalLossCount,
             totalLossValue: totalLossValue,
-            alertLevel: totalLossCount > 50 ? 'Nguy cấp' : (totalLossCount > 20 ? 'Cảnh báo' : 'Bình thường'),
             details: report
         };
 
@@ -368,10 +376,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Export to CSV
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Ngày báo cáo,Món hao hụt,Tổng thiệt hại,Trạng thái\n";
+            csvContent += "Ngày báo cáo,Món hao hụt,Tổng thiệt hại thực tế\n";
             
             history.forEach(item => {
-                const row = `${item.date},${item.totalLossItems},${item.totalLossValue},${item.alertLevel}`;
+                const row = `${item.date},${item.totalLossItems},${item.totalLossValue}`;
                 csvContent += row + "\n";
             });
 
@@ -431,9 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="history-card">
                 <div class="date">
                     <span>${item.date}</span>
-                    <span class="badge ${item.totalLossItems > 50 ? 'badge-danger' : (item.totalLossItems > 20 ? 'badge-warning' : 'badge-success')}">
-                        ${item.alertLevel}
-                    </span>
                 </div>
                 <h4>Báo cáo hao hụt kiểm kê</h4>
                 <div class="stats">
@@ -443,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="item-stat">
                         <span class="val text-yellow">${item.totalLossValue.toLocaleString('vi-VN')} ₫</span>
-                        <span class="lab">Thiệt hại</span>
+                        <span class="lab">Thiệt hại thực tế</span>
                     </div>
                 </div>
             </div>
@@ -462,39 +467,23 @@ document.addEventListener('DOMContentLoaded', function() {
         report.forEach(row => {
             const tr = document.createElement('tr');
             
-            let statusBadge = '';
-            if (row.diff < 0) {
-                statusBadge = `<span class="badge badge-danger">Hao hụt (-${Math.abs(row.diff)})</span>`;
-            } else if (row.diff > 0) {
-                statusBadge = `<span class="badge badge-success">Tăng (+${row.diff})</span>`;
-            } else {
-                statusBadge = `<span class="badge badge-warning">Ổn định</span>`;
-            }
-
             tr.innerHTML = `
                 <td style="font-weight: 500;">${row.name}</td>
+                <td style="color: var(--text-secondary);">${row.price.toLocaleString('vi-VN')} ₫</td>
                 <td>${row.count1}</td>
                 <td>${row.count2}</td>
-                <td class="${row.diff < 0 ? 'loss-value' : ''}">${row.diff === 0 ? '--' : row.diff}</td>
-                <td>${statusBadge}</td>
+                <td style="font-weight: 600;" class="${row.diff < 0 ? 'text-pink' : (row.diff > 0 ? 'text-green' : '')}">
+                    ${row.diff > 0 ? '+' : ''}${row.diff}
+                </td>
+                <td style="font-weight: 700;" class="${row.lossValue > 0 ? 'text-yellow' : ''}">
+                    ${row.lossValue > 0 ? row.lossValue.toLocaleString('vi-VN') + ' ₫' : '--'}
+                </td>
             `;
             tbody.appendChild(tr);
         });
 
         document.getElementById('total-loss-items').textContent = totalCount;
         document.getElementById('total-loss-value').textContent = totalValue.toLocaleString('vi-VN') + ' ₫';
-        
-        const alertLevel = document.getElementById('alert-level');
-        if (totalCount > 50) {
-            alertLevel.textContent = 'Cảnh báo Đỏ';
-            alertLevel.className = 'value text-pink';
-        } else if (totalCount > 20) {
-            alertLevel.textContent = 'Cảnh báo Vàng';
-            alertLevel.className = 'value text-yellow';
-        } else {
-            alertLevel.textContent = 'Bình thường';
-            alertLevel.className = 'value text-green';
-        }
     }
 
 });
